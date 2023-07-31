@@ -1,0 +1,199 @@
+\documentclass[a4paper,12pt]{article}
+
+\usepackage[left=3.5cm, right=3.5cm, top=3cm, bottom=3cm]{geometry}
+
+\usepackage[spanish]{babel}
+
+\usepackage{graphicx}
+
+
+\begin{document}
+\title{Informe escrito del proyecto de \\programación de 1er año de la carrera
+ de\\ Ciencias de la Computación \\de la Universidad de La Habana}
+\author{Arlette Martínez Lemes}
+\date{C-112}
+\maketitle
+
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\begin{center}
+   \section{Arquitectura básica del proyecto}
+\end{center}
+
+ Para el correcto desarrollo de este proyecto fue necesario la implementación 
+ de nuevas clases y métodos, al igual que la modificación de otros pocos; estos
+ son:
+
+ \begin{center}
+    \begin{tabular}{cccccc}
+ Clases modificadas:                &   &   &   &   &        Clases implementadas por mí:\\
+                   
+    - Moogle.cs                     &   &   &   &   &         - Document.cs \\
+    - Program.cs                    &   &   &   &   &         - Operations.cs \\
+    - Index.razor                   &   &   &   &   &         - QuerOperations.cs \\
+    - Index.razor.css               \\                  
+ 
+  \end{tabular}
+ 
+
+ 
+   \section{Flujo de los datos durante la ejecución de la búsqueda}
+    *La mención de métodos será de la forma: \textbf{“NombreDeLaClase.NombreDelMétodo”}*
+ 
+ \subsection{Pre-procesamiento}
+
+ 
+ Una vez sea ejecutado el proyecto, serán efectuados una serie de métodos para el procesamiento 
+ de la información con la que se trabajará posteriormente. Primero que todo se accederá al método 
+ \textbf{“QueryOperations.LoadFiles”}, el cual a partir de los documentos \emph{.txt} encontrados en la carpeta \emph{“Content”}
+ creará un \emph{array} de \emph{Document} con el que ya se podrá trabajar la información.
+ Luego será creada una instancia de la clase \textbf{“Operations”}, donde utilizando la técnica \textbf{TF-IDF} se procesan los
+ textos evaluando la importancia relativa de cada palabra en cada documento dentro de la colección de documentos.
+
+
+ \subsection{Búsqueda}
+
+ Al presionar el botón \emph{“Buscar”}, es llamado el método \textbf{“Moogle.Query”} donde se verifica si la \emph{query}
+ está vacía, devolviendo así un mensaje pidiendo al usuario insertar una consulta. En caso contrario, 
+ se comienza a trabajar en la \emph{query} llamando a diversos métodos que se encargarán de normalizar los textos
+ y darles peso a las palabras de la consulta. Luego se crea una instancia de la clase \emph{“SearchItem”}; y a la
+ hora de devolver los resultados que coincidan total o parcialmente con la \emph{query}, estos serán ordenados por
+ el \textbf{Score} de manera descendente y con un \textbf{Snippet} encontrado por el método \textbf{“QueryOperations.Snippet”},
+ que retornará un pequeño fragmento del texto, que casi siempre contendrá la/s palabra/s buscadas. Además, 
+ siempre será retornada una sugerencia de búsqueda que en caso de no encontrarse en el corpus de documentos
+ la palabra deseada, sugerirá otra que será de las sí contenidas en nuestra base de datos, la más parecida
+ lexicográficamente a la búsqueda en cuestión.
+
+ 
+
+ \newpage 
+
+ 
+ \section{Funcionalidad de las clases implementadas por mí}
+
+    *Las propiedades de las clases serán mencionadas de forma: \textbf{(.Propiedad)}*
+ 
+
+ \subsection{Document}
+
+ Clase que administra mediante propiedades el nombre \textbf{(.Name)}, la dirección \textbf{(.Path)} e información 
+ de un documento \textbf{(.Words)}.
+
+ \subsection{Operations}\label{sub:Ope}
+
+ Objeto que al ser instanciado en la clase \textbf{Program} realiza un conjunto de operacion
+ pre-procesar la información obtenida con anterioridad. Para procesar la información del modo 
+ esperado, primero que nada, se accede al método \textbf{“Operations.TF”}, con el cual obtendremos la
+ frecuencia de cada palabra en cada documento. Para ello al método se le pasa como parámetro 
+ un \emph{array} de \emph{Document} con el texto de cada \emph{txt} siendo sólo números y letras en minúsculas sin 
+ tildar. Luego iremos indexando en cada palabra de cada \emph{Document} con ayuda de la propiedad 
+ \textbf{(.Words)} que contiene esta clase; entonces iremos añadiendo cada palabra a un diccionario
+ (aquí agruparemos todas las palabras distintas de nuestros documentos) ahí se le asociará un
+ índice que será la columna que ocupa la palabra en la matriz donde se relacionan palabras con
+ documentos. Después de calculado el \textbf{TF} (Term Frecuency) se accederá al método \textbf{“Operations.IDF”}
+ donde se le pasa como parámetro una lista de \emph{array} de \emph{double} (matriz TF) y se calcula el \textbf{IDF}
+ (Inverse Document Frecuency) de cada palabra utilizando la expresión matemática:
+
+ \begin{equation}
+   IDF = \log(\frac{1+ N}{n_p})
+ \end{equation} 
+
+ Donde $N$ representa el número total de documentos y $n_p$ el número de documentos que contienen la palabra en cuestion.
+ Así finalmente se accede al método \textbf{“Operations.TF\_IDF”} donde se multiplicará la matriz de \textbf{TF} por el \emph{array} 
+ de \textbf{IDF}, obteniendo la matriz de \textbf{TF-IDF}.
+
+ \subsection{QueryOperations}
+
+ Clase que contiene múltiples métodos usados mayormente en el trabajo con la \emph{query}. 
+ Los métodos encontrados en esta clase son; \textbf{“QueryOperations.LoadFiles”} y 
+ \textbf{“QueryOperations.Normalize”} que serán utilizados a priori de la inserción de la \emph{query} y
+ los cuales son fundamentales en la obtención limpia de la información base. 
+ Luego estarán los métodos \textbf{“QueryOperations.QueryNormalize”},
+ \textbf{“QueryOperations.Symbols”}, \textbf{“QueryOperations.QueryTF”} y 
+ \textbf{“QueryOperations.QueryTF\_IDF”} que se encargarán de dar valor a las palabras de la \emph{query},
+ contemplando el máximo valor para aquellas palabras que consten en su estructura del
+ símbolo \textbf{\$}. También aquí se verá \textbf{“QueryOperations.CosineSimilarity”} que acompañado de
+ \textbf{“QueryOperations.Norms”} y \textbf{“QueryOperations.QueryNorms”}, mide la similitud entre dos
+  vectores o documentos.
+ Finalmente \textbf{“QueryOperations.DescendingOrder”} que organiza de forma descendente los 
+  documentos que coinciden total o parcialmente con la consulta dada; 
+  \textbf{“QueryOperations.Snippet”} que extrae de cada documento devuelto un pequeño fragmento
+ en el que aparece casi siempre la/s palabra/s que coincidieron. 
+ Y \textbf{“QueryOperations.SimilarSuggestion”} que auxiliado por
+ \textbf{“QueryOperations.LevenshteinDistance”} hace que según la consulta echa, sea posible
+ (en caso de no encontrar ninguna coincidencia) sugerir una consulta que siendo esta la más
+  parecida a la anteriormente echa, además aparezca \textbf{100\%} en la base de datos.
+
+
+ \section{Carpeta AlgebraContent y sus clases}
+
+ En esta sección hablaremos de las clases implementadas para cubrir las exigencias de la materia de \textbf{Álgebra I}.
+ 
+
+ \subsection{Matrix}
+
+ Objeto que al ser instanciado consta de varios métodos que permiten al usuario realizar operaciones con matrices.
+ Estos métodos son:
+ \begin{itemize}
+    \item[-] \textbf{"Matrix.MatrixAddition"}: Suma dos matrices.
+    \item[-] \textbf{"Matrix.MatrixMultiplication"}: Multiplica dos matrices.
+    \item[-] \textbf{"Matrix.MultiplicationForNumber"}: Multiplica una matriz por un escalar.
+    \item[-] \textbf{"Matrix.MultiplicationForVector"}: Multiplica un obejto Matrix por un objeto Vector.
+    \item[-] \textbf{"Matrix.MatrixSubtraction"}: Halla la diferencia de dos matrices.
+    \item[-] \textbf{"Matrix.MatrixTranspose"}: Halla la traspuesta de una matriz.
+ \end{itemize}
+
+
+ \subsection{Vector}
+ 
+ Objeto que al crear una instancia nos brinda la posibilidad de usar sus métodos con el fin de 
+ realizar operaciones algebraicas con vectores. E aquí los métodos:
+ \begin{itemize}
+    \item[-] \textbf{"Vector.VectorAddition"}: Suma dos vectores.
+    \item[-] \textbf{"Vector.VectorSubtraction"}: Halla la direncia de dos vectores.
+    \item[-] \textbf{"Vector.VectorMultiplication"}: Multiplica dos vectores.
+    \item[-] \textbf{"Vector.MultiplicationForNumber"}: Multiplica un vector por un escalar.
+ \end{itemize}
+
+
+
+\section{Funcionalidad extra implementada} 
+ 
+ En este buscador el símbolo \textbf{\$} tiene como utilidad la de dar mayor importancia a los documentos que
+ coincidan con la/s palabra/s a la/s que se le/s agregó tal símbolo. Para que esta funcionalidad tenga
+ efecto la palabra deberá estar bien escrita, ya que no importa en qué parte de la palabra se encuentre 
+ el símbolo, igual lo reconocerá, pero sólo dará los resultados esperados si la palabra está correcta al
+ quitar el símbolo. 
+
+ \end{center}
+ 
+ Ejemplos:
+
+
+ \begin{figure}[h]
+    \center
+    \includegraphics[width=14cm]{Sin \$.jpg}
+    \caption{Búsqueda sin \$}
+ \end{figure}
+
+
+ \begin{figure}[h]
+    \center
+    \includegraphics[width=14cm]{Con \$.jpg}
+    \caption{Búsqueda con \$}
+ \end{figure}
+
+
+ \begin{figure}[h]
+    \center
+    \includegraphics[width=12cm]{incorrecta.jpg}
+    \caption{Búsqueda incorrecta}
+ \end{figure}
+
+
+\end{document}

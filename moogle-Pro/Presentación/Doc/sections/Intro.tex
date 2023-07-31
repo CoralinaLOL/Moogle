@@ -1,0 +1,53 @@
+\section{Introducción}\label{Intro}
+
+\setbeamercolor{block title}{bg=blue!50!black,fg=white}
+\setbeamercolor{block body}{bg=blue!20,fg=white}
+
+\begin{frame}
+    \begin{columns}[t]
+        \begin{column}{.5\textwidth}
+          \tableofcontents[sections={1-2},currentsection]
+        \end{column}
+        \begin{column}{.5\textwidth}
+          \tableofcontents[sections={3-4},currentsection]
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\subsection{¿Qué es \textbf{Moogle!} ?}
+
+
+\begin{frame}{¿Qué es \textbf{Moogle!} ?}
+\begin{center}
+    \textbf{Moogle!} es una aplicación \emph{*totalmente original*} cuyo propósito es buscar inteligentemente
+    un texto en un conjunto de documentos.\\
+    \pause
+    Es una aplicación web, desarrollada con tecnología .NET Core 6.0, específicamente usando 
+    Blazor como \emph{*framework*} web para la interfaz gráfica, y en el lenguaje C\#.
+\end{center}
+\end{frame}
+
+\subsection{Arquitectura del sistema}
+
+\begin{frame}{Arquitectura del sistema}
+\begin{center}
+    \begin{block}{Clases modificadas:}
+            \begin{itemize}
+                \item[-]<1->{Moogle.cs}
+                \item[-]<2->{Program.cs} 
+                \item[-]<3->{Index.razor} 
+                \item[-]<4->{Index.razor.css}    
+            \end{itemize}
+    \end{block}
+
+    \pause
+
+    \begin{block}{Clases implementadas por mí:}
+            \begin{itemize}
+                \item[-]<5->{Document.cs} 
+                \item[-]<6->{Operations.cs} 
+                \item[-]<7->{QueryOperations.cs}   
+            \end{itemize}
+    \end{block}
+\end{center}
+\end{frame}
